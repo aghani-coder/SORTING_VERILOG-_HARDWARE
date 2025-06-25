@@ -1,11 +1,12 @@
 
-module top(clk,rstn,s,done,Radd,datain,wrin);
+module top(clk,rstn,s,done,Radd,datain,wrin,rd,DOUT);
 
 parameter DATA_WIDTH   = 8;
 parameter ADDR_WIDTH=3; 
 input [ADDR_WIDTH -1:0] Radd;
 input  [DATA_WIDTH -1:0] datain;
-input clk,rstn, s,wrin;
+output  [DATA_WIDTH -1:0] DOUT;
+input clk,rstn, s,wrin,rd;
 
 reg [2:0] nstate;
 reg [2:0] pstate;
@@ -38,7 +39,7 @@ checkb #(ADDR_WIDTH) m4(
  register#(DATA_WIDTH) m6(.clk(clk),.en(ena),.rstn(rstn),.din(dataout),.dout(Areg));
  register#(DATA_WIDTH) m7(.clk(clk),.en(enb),.rstn(rstn),.din(dataout),.dout(Breg));
  comparator #(DATA_WIDTH) m8( .A(Areg),.B(Breg),.Agtb(Agtb));
- 
+ assign  DOUT=rd?dataout:0;
 always @ (posedge clk ) begin
     pstate <= nstate;
 end
@@ -113,7 +114,7 @@ end
 else
 nstate=3'b111;
 	end
-3'b111:begin 
+3'b111:begin // will be end state until s=0
 done=1;
 if(s==1)
 begin

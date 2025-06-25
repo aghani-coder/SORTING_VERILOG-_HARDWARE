@@ -5,10 +5,12 @@ module tb_top;
   parameter DATA_WIDTH = 8;
   parameter ADDR_WIDTH = 3;
 
-  reg clk, rstn, s, wrin;
+  reg clk, rstn, s, wrin,rd;
   reg [DATA_WIDTH-1:0] datain;
   reg [ADDR_WIDTH-1:0] Radd;
   integer i;
+  wire done;
+  wire [DATA_WIDTH-1:0] DOUT;
   // Instantiate the module
   top #(DATA_WIDTH, ADDR_WIDTH) DUT (
     .clk(clk),
@@ -17,7 +19,9 @@ module tb_top;
     .done(done),
     .Radd(Radd),
     .datain(datain),
-    .wrin(wrin)
+    .wrin(wrin),
+	 .rd(rd),
+	 .DOUT(DOUT)
   );
 
   // Clock generation
@@ -27,7 +31,7 @@ module tb_top;
     $display("Starting Simulation...");
     $dumpfile("waveform.vcd");
     $dumpvars(0, tb_top);
-
+    rd=1;
     clk = 0;
     rstn = 0;
     s = 0;
@@ -55,7 +59,10 @@ module tb_top;
     // Wait until done
     wait (done);
     #40 s = 0;
-
+      for ( i = 0; i < 8; i = i + 1) begin
+      Radd = i;
+      #10;
+    end
     #20;
     $display("Simulation Done.");
     $stop;
